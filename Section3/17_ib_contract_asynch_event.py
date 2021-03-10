@@ -22,18 +22,33 @@ class TradingApp(EWrapper, EClient):
     def contractDetails(self, reqId, contractDetails):
         print("redID: {}, contract:{}".format(reqId,contractDetails))
 
-# create a function since we need to pass a function to a thread
-def websocket_con():
-    app.run() 
 
+def websocket_con():
+    app.run()
+
+
+def stop_app():
+    print('Waiting for close event')
+    close_event.wait() # (optional) indicates waiting for the event to happen
+    if close_event.is_set(): # will get triggered after close_event.set()
+        app.disconnect()
+        print('Client is disconnecting')
+
+
+close_event = threading.Event()
 app = TradingApp()
 app.connect("127.0.0.1", 7497, clientId=1)
 
 # starting a separate daemon thread to execute the websocket connection
-# s.t. when the main thread terminates, app.run() terminates as well
-con_thread = threading.Thread(target=websocket_con, daemon=True)
+con_thread = threading.Thread(target=websocket_con)
 con_thread.start()
 time.sleep(1) # some latency added to ensure that the connection is established
+
+# add a close even thread since the app.run() method blocks the thread where
+# it was executed, so if you want to disconnect from the app, you have to run
+# it from different thread
+stop_app_thread = threading.Thread(target=stop_app)
+stop_app_thread.start();
 
 #creating object of the Contract class - will be used as a parameter for other function calls
 contract = Contract()
@@ -44,4 +59,4 @@ contract.exchange = "SMART"
 
 app.reqContractDetails(100, contract) # EClient function to request contract details
 time.sleep(5) # some latency added to ensure that the contract details request has been processed
-print('Now quitting the program...')
+close_event.set()

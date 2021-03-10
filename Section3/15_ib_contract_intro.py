@@ -30,5 +30,5 @@ contract.secType = "STK"
 contract.currency = "USD"
 contract.exchange = "SMART"
 
-app.reqContractDetails(100, contract)
+app.reqContractDetails(100, contract) # defined in EClient
 app.run()
