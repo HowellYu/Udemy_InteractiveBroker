@@ -1,4 +1,4 @@
-### Section 4 Historical Data
+### Section 4: Historical Data
 
 > We are going to work the most with History Bar Data
 
