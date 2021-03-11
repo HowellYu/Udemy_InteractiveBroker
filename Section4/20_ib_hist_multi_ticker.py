@@ -16,15 +16,15 @@ import time
 class TradingApp(EWrapper, EClient):
     def __init__(self):
         EClient.__init__(self,self)
-        
+
     def historicalData(self, reqId, bar):
         print("HistoricalData. ReqId:", reqId, "BarData.", bar)
-        
+
 
 def websocket_con():
     app.run()
-    
-app = TradingApp()      
+
+app = TradingApp()
 app.connect("127.0.0.1", 7497, clientId=1)
 
 # starting a separate daemon thread to execute the websocket connection
@@ -39,15 +39,15 @@ def usTechStk(symbol,sec_type="STK",currency="USD",exchange="ISLAND"):
     contract.secType = sec_type
     contract.currency = currency
     contract.exchange = exchange
-    return contract 
+    return contract
 
 def histData(req_num,contract,duration,candle_size):
-    app.reqHistoricalData(reqId=req_num, 
+    app.reqHistoricalData(reqId=req_num,
                           contract=contract,
                           endDateTime='',
                           durationStr=duration,
                           barSizeSetting=candle_size,
-                          whatToShow='ADJUSTED_LAST',
+                          whatToShow='ADJUSTED_LAST', # there are volume associated with adjusted last. unit: 1k
                           useRTH=1,
                           formatDate=1,
                           keepUpToDate=0,
@@ -58,4 +58,3 @@ tickers = ["FB","AMZN","INTC"]
 for ticker in tickers:
     histData(tickers.index(ticker),usTechStk(ticker),'1 M', '5 mins')
     time.sleep(10)  # some latency added to ensure that the contract details request has been processed
-
